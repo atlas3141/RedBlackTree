@@ -28,6 +28,10 @@ Node* Node::getUncle(){
 int Node::getData(){
   return data;
 }
+void Node::setData(int newData){
+  data = newData;
+}
+
 void Node::setLeft(Node* node){
   left = node;
   if (left){

@@ -68,7 +68,7 @@ int main(){
 
 
   while(running){
-   
+
     cin.getline(input, 128);
     toLower(input);
     
@@ -82,11 +82,42 @@ int main(){
       
     }
     else if(input[0] == 'd'){
-      cout << "Deletion still needs to be implimented" << endl;
+      if (tree->getHead() == NULL){
+        cout << "You can't delete from an empty list!" << endl;
+      }
+      else{
+        cout << "What am deleting?" << endl;
+        int number;
+        cin >> number;
+	cin.ignore();
+	Node* toDelete = tree->search(number);
+	if(toDelete){
+	  tree->remove(toDelete);
+	}
+        else cout << number << " is not in the tree." << endl;
+      }
     } 
     else if(input[0] == 'p'){
-      tree->print(tree->getHead());
+      if (tree->getHead()){
+	tree->print(tree->getHead());
+      }
+      else cout << "Empty Tree" << endl;
     } 
+    else if(input[0] == 's'){
+      if (tree->getHead() == NULL) {
+	cout << "You can't search an empty list!" << endl;
+      }
+      else{
+	cout << "What am I looking for?" << endl;
+	int number;
+	cin >> number;
+	cin.ignore();
+	if (tree->search(number)){
+	    cout << "The number " << number << " is in the tree" << endl;
+	  }
+	else cout << number << " is not in the tree." << endl; 
+      }
+     }
     else if(input[0] == 'q'){
       running = false;
     }

@@ -39,15 +39,15 @@ void RedBlackTree::rotateRight(Node* current){
 }
 void RedBlackTree::fix(Node* current){
   if (current->isRed() && current->getParent()->isRed()){
-    if(current->isRight()  && !current->getParent()->isRight()){
-      rotateLeft(current->getParent());
-      current = current->getLeft();
-    }
-    else if(!current->isRight() && current->getParent()->isRight()){
-      rotateRight(current->getParent());
-      current = current->getRight();
-    }
     if (!current->getUncle()->isRed()){
+      if(current->isRight()  && !current->getParent()->isRight()){
+	rotateLeft(current->getParent());
+	current = current->getLeft();
+      }
+      else if(!current->isRight() && current->getParent()->isRight()){
+	rotateRight(current->getParent());
+	current = current->getRight();
+      }
       if(current->isRight()){
 	current->getParent()->getParent()->setRed(true);
 	current->getParent()->setRed(false);
@@ -67,6 +67,130 @@ void RedBlackTree::fix(Node* current){
     }
   }
   head->setRed(false);
+}
+void RedBlackTree::fix2Black(Node* black,Node* parent){
+  
+  if (black == head) return;
+  if (parent->getLeft() == black){
+   if (parent->getRight()->isRed()){
+      rotateLeft(parent);
+      parent->setRed(true);
+      parent->getParent()->setRed(false);
+      fix2Black(black,parent);
+    }
+    else if (!parent->isRed() && 
+	     !parent->getRight()->getRight()->isRed() &&
+	     !parent->getRight()->getLeft()->isRed()){
+      parent->getRight()->setRed(true);
+      fix2Black(parent,parent->getParent());
+    }
+    else if (parent->isRed() && 
+	     !parent->getRight()->getRight()->isRed() &&
+             !parent->getRight()->getLeft()->isRed()){
+      parent->setRed(false);
+      parent->getRight()->setRed(true);
+      return;
+    }
+    else if(parent->getRight()->getLeft()->isRed()){
+      rotateRight(parent->getRight());
+      parent->getRight()->getRight()->setRed(true);
+      parent->getRight()->setRed(false);
+      fix2Black(black,parent);
+    }
+    else{
+      rotateLeft(parent);
+      parent->getParent()->setRed(parent->isRed());
+      parent->setRed(false);
+      parent->getParent()->getRight()->setRed(false);
+      return;
+    }
+  }
+  else{
+    if (parent->getLeft()->isRed()){
+      rotateRight(parent);
+      parent->setRed(true);
+      parent->getParent()->setRed(false);
+      fix2Black(black,parent);
+    }
+    else if (!parent->isRed() &&
+             !parent->getLeft()->getRight()->isRed() &&
+             !parent->getLeft()->getLeft()->isRed()){
+      parent->getLeft()->setRed(true);
+      fix2Black(parent,parent->getParent());
+    }
+    else if (parent->isRed() &&
+             !parent->getLeft()->getRight()->isRed() &&
+             !parent->getLeft()->getLeft()->isRed()){
+      parent->setRed(false);
+      parent->getLeft()->setRed(true);
+      return;
+    }
+    else if(parent->getLeft()->getRight()->isRed()){
+      rotateLeft(parent->getLeft());
+      parent->getLeft()->getLeft()->setRed(true);
+      parent->getLeft()->setRed(false);
+      fix2Black(black,parent);
+    }
+    else{
+      rotateRight(parent);
+      parent->getParent()->setRed(parent->isRed());
+      parent->setRed(false);
+      parent->getParent()->getLeft()->setRed(false);
+      return;
+    }
+  }
+}
+void RedBlackTree::remove(Node* toDelete){
+  if(toDelete->getRight() && toDelete->getLeft()){
+    Node* swap = toDelete->getRight();
+    while (swap->getLeft()){
+      swap = swap->getLeft();
+    }
+    toDelete->setData(swap->getData());
+    toDelete = swap;
+  } 
+  Node* parent = toDelete->getParent();
+  Node* child = toDelete->getRight();
+  if(!child){
+    child = toDelete->getLeft();
+  }
+ 
+  if (toDelete == head){
+    head = child;
+  }
+  if (toDelete->isRight()){
+    parent->setRight(child);
+  }
+  else parent->setLeft(child);
+  
+  if(!toDelete->isRed()){
+    if(child->isRed()){
+      child->setRed(false);
+    }
+    else{
+      fix2Black(child,parent);
+    }
+  }
+}
+  
+ 
+Node* RedBlackTree::search(int number, Node* current){
+  if (!current){
+    current  = head;
+  }
+  if(number < current->getData()){
+    if (current->getLeft()){
+      return search(number, current->getLeft());
+    }
+    else return NULL;
+  }
+  else if(number > current->getData()){
+    if (current->getRight()){
+      return search(number, current->getRight());
+    }
+    else return NULL;
+  }
+  else return current;
 }
 void RedBlackTree::add(Node* current, int number){
   if (head == NULL){
