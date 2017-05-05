@@ -6,7 +6,7 @@ RedBlackTree::RedBlackTree(){
   head = NULL;
 }
 
-void rotateLeft(Node* current, Node* &head){
+void RedBlackTree::rotateLeft(Node* current){
   Node* newHead = current->getRight();
   if (current == head){
     head = newHead;
@@ -22,7 +22,7 @@ void rotateLeft(Node* current, Node* &head){
   
   
 }
-void rotateRight(Node* current,Node* &head){
+void RedBlackTree::rotateRight(Node* current){
   Node* newHead = current->getLeft();
   if (current == head){
     head = newHead;
@@ -37,65 +37,35 @@ void rotateRight(Node* current,Node* &head){
   newHead->setRight(current);
 
 }
-void fix(Node* current,Node* &head){
-  if (current->getParent()){  
-      if (current->isRed() && current->getParent()->isRed()){
-	if (!current->getUncle()){
-	  if(current->isRight()){       
-	    if(current->getParent()->isRight()){
-	      current->getParent()->getParent()->setRed(true);
-	      current->getParent()->setRed(false);
-	      rotateLeft(current->getParent()->getParent(),head);
-	    }
-	    else{
-	      rotateLeft(current->getParent(),head);
-	      fix(current->getLeft(),head);
-	    }
-	  }
-	  else{
-	    if (!current->getParent()->isRight()){
-	      current->getParent()->getParent()->setRed(true);
-              current->getParent()->setRed(false);
-	      rotateRight(current->getParent()->getParent(),head);
-	    }
-	    else{
-	      rotateRight(current->getParent(),head);
-	      fix(current->getRight(),head);
-	    }
-	  }
-	}
-	else if (!current->getUncle()->isRed()){
-          if(current->isRight()){
-            if(current->getParent()->isRight()){
-              current->getParent()->getParent()->setRed(true);
-              current->getParent()->setRed(false);
-              rotateLeft(current->getParent()->getParent(),head);
-            }
-            else{
-              rotateLeft(current->getParent(),head);
-              fix(current->getLeft(),head);
-            }
-          }
-          else{
-            if (!current->getParent()->isRight()){
-              current->getParent()->getParent()->setRed(true);
-              current->getParent()->setRed(false);
-              rotateRight(current->getParent()->getParent(),head);
-            }
-            else{
-              rotateRight(current->getParent(),head);
-              fix(current->getRight(),head);
-            }
-          }
-        }
-	else if (current->getUncle()->isRed()){
-	  current->getUncle()->setRed(false);
-	  current->getParent()->setRed(false);
-	  current->getParent()->getParent()->setRed(true);
-	  fix(current->getParent()->getParent(),head);
-	}
+void RedBlackTree::fix(Node* current){
+  if (current->isRed() && current->getParent()->isRed()){
+    if(current->isRight()  && !current->getParent()->isRight()){
+      rotateLeft(current->getParent());
+      current = current->getLeft();
+    }
+    else if(!current->isRight() && current->getParent()->isRight()){
+      rotateRight(current->getParent());
+      current = current->getRight();
+    }
+    if (!current->getUncle()->isRed()){
+      if(current->isRight()){
+	current->getParent()->getParent()->setRed(true);
+	current->getParent()->setRed(false);
+	rotateLeft(current->getParent()->getParent());
+      }
+      else{
+	current->getParent()->getParent()->setRed(true);
+	current->getParent()->setRed(false);
+	rotateRight(current->getParent()->getParent());
       }
     }
+    else if (current->getUncle()->isRed()){
+      current->getUncle()->setRed(false);
+      current->getParent()->setRed(false);
+      current->getParent()->getParent()->setRed(true);
+      fix(current->getParent()->getParent());
+    }
+  }
   head->setRed(false);
 }
 void RedBlackTree::add(Node* current, int number){
@@ -113,7 +83,7 @@ void RedBlackTree::add(Node* current, int number){
       else{
 	Node* newNode = new Node(number);
 	current->setLeft(newNode);
-	fix(newNode,head);
+	fix(newNode);
       }
     }
     if (number > current->getData()){
@@ -123,7 +93,7 @@ void RedBlackTree::add(Node* current, int number){
       else{
 	Node* newNode = new Node(number);
 	current->setRight(newNode);
-	fix(newNode,head);
+	fix(newNode);
       }
     }
   }
@@ -135,7 +105,8 @@ void RedBlackTree::print(Node* current, int indent){
   for (int i = 0; i < indent; i++){
     cout << "  ";
   }
-  cout << current->getData() << " " << current->isRed() << endl;
+  cout << current->getData() << " "; 
+  current->isRed() ? cout << "R" << endl : cout << "B" << endl;
   if(current->getLeft()){
     print(current->getLeft(), indent+1);
   }

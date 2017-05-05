@@ -58,7 +58,10 @@ Node::~Node(){
   delete &data;
 }
 bool Node::isRed(){
-  return red;
+  if (this){
+    return red;
+  }
+  else return false;
 }
 bool Node::isRight(){
   return rightChild;

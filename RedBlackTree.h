@@ -9,6 +9,9 @@ using namespace std;
 class RedBlackTree{
  private:
   Node* head;
+  void rotateLeft(Node* current);
+  void rotateRight(Node* current);
+  void fix(Node* current);
 
  public:
   RedBlackTree();

@@ -67,7 +67,7 @@ int main(){
   bool running = true;
 
 
-  while(true){
+  while(running){
    
     cin.getline(input, 128);
     toLower(input);
